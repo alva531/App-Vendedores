@@ -28,7 +28,7 @@ const archivoPDF = (cliente) => {
   return `pedido-${slug || 'cliente'}.pdf`
 }
 
-const VERSION = 'v2.2'
+const VERSION = 'v0.5'
 
 function crearPDF(data) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
@@ -316,9 +316,7 @@ export default function App() {
                 <label>
                   <span>Cantidad</span>
                   <input
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
+                    type="text"
                     value={p.cantidad}
                     onChange={(e) => setProd(i, 'cantidad', e.target.value)}
                   />
