@@ -28,7 +28,7 @@ const archivoPDF = (cliente) => {
   return `pedido-${slug || 'cliente'}.pdf`
 }
 
-const VERSION = 'v0.5'
+const VERSION = 'v0.75'
 
 function crearPDF(data) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
@@ -55,9 +55,10 @@ function crearPDF(data) {
     ['Condición:', data.condicion],
   ]
   if (data.transporte) {
-    filas.push(['Chofer:', data.chofer || '-'])
-    filas.push(['DNI:', data.dni || '-'])
-    filas.push(['Patentes:', data.patentes || '-'])
+    filas.push(['Transporte:', 'Incluye transporte'])
+    if (data.chofer) filas.push(['Chofer:', data.chofer])
+  } else {
+    filas.push(['Transporte:', 'No incluye transporte'])
   }
   const xVal = M + 26
   let yInfo = 40
@@ -114,6 +115,23 @@ function crearPDF(data) {
     y += 7
   }
 
+  const obs = (data.observaciones || '').trim()
+  if (obs) {
+    y += 2
+    if (y > doc.internal.pageSize.getHeight() - 30) {
+      doc.addPage()
+      y = 20
+    }
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('Observaciones:', M, y)
+    y += 6
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9.5)
+    const lineasObs = obs.split(/\r?\n/).flatMap((l) => doc.splitTextToSize(l, W - 2 * M))
+    doc.text(lineasObs, M, y)
+  }
+
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8)
   doc.setTextColor(120)
@@ -131,20 +149,19 @@ export default function App() {
   const [desc2, setDesc2] = useState(d?.desc2 ?? '')
   const [transporte, setTransporte] = useState(d?.transporte ?? false)
   const [chofer, setChofer] = useState(d?.chofer ?? '')
-  const [dni, setDni] = useState(d?.dni ?? '')
-  const [patentes, setPatentes] = useState(d?.patentes ?? '')
   const [productos, setProductos] = useState(
     d?.productos?.length ? d.productos : [emptyProduct()],
   )
+  const [observaciones, setObservaciones] = useState(d?.observaciones ?? '')
   const [busy, setBusy] = useState(false)
   const [aviso, setAviso] = useState('')
 
   useEffect(() => {
     localStorage.setItem(
       'pedido',
-      JSON.stringify({ cliente, condicion, desc1, desc2, transporte, chofer, dni, patentes, productos }),
+      JSON.stringify({ cliente, condicion, desc1, desc2, transporte, chofer, productos, observaciones }),
     )
-  }, [cliente, condicion, desc1, desc2, transporte, chofer, dni, patentes, productos])
+  }, [cliente, condicion, desc1, desc2, transporte, chofer, productos, observaciones])
 
   const porc1 = num(desc1)
   const porc2 = num(desc2)
@@ -175,8 +192,7 @@ export default function App() {
         porc2,
         transporte,
         chofer,
-        dni,
-        patentes,
+        observaciones,
       }
       const doc = crearPDF(data)
       const nombre = archivoPDF(cliente)
@@ -204,9 +220,8 @@ export default function App() {
     setDesc2('')
     setTransporte(false)
     setChofer('')
-    setDni('')
-    setPatentes('')
     setProductos([emptyProduct()])
+    setObservaciones('')
     localStorage.removeItem('pedido')
     setAviso('')
   }
@@ -259,7 +274,7 @@ export default function App() {
         {transporte && (
           <div className="transporte">
             <label>
-              <span>Chofer (nombre y apellido)</span>
+              <span>Chofer (opcional)</span>
               <input
                 value={chofer}
                 onChange={(e) => setChofer(e.target.value)}
@@ -267,27 +282,6 @@ export default function App() {
                 autoComplete="off"
               />
             </label>
-            <div className="trans-datos">
-              <label>
-                <span>DNI</span>
-                <input
-                  value={dni}
-                  onChange={(e) => setDni(e.target.value)}
-                  placeholder="DNI"
-                  inputMode="numeric"
-                  autoComplete="off"
-                />
-              </label>
-              <label>
-                <span>Patentes</span>
-                <input
-                  value={patentes}
-                  onChange={(e) => setPatentes(e.target.value)}
-                  placeholder="Ej: ABC123, XYZ789"
-                  autoComplete="off"
-                />
-              </label>
-            </div>
           </div>
         )}
 
@@ -356,6 +350,16 @@ export default function App() {
             />
           </label>
         </div>
+
+        <label className="obs-field">
+          <span>Observaciones</span>
+          <textarea
+            rows="3"
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            placeholder="Notas adicionales (opcional)"
+          />
+        </label>
       </section>
 
       {aviso && <p className="aviso">{aviso}</p>}

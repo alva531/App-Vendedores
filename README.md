@@ -11,6 +11,7 @@ Formulario en pantalla táctil con:
 - **Productos dinámicos**: nombre + cantidad por fila, con botones para agregar/quitar
 - **Checkbox "Incluye transporte"**: al marcarlo pide datos del chofer (nombre y apellido), DNI y patentes
 - **Descuento 1 y Descuento 2** (porcentajes, opcionales)
+- **Observaciones** (textarea, opcional; se imprime al final del PDF)
 
 Al tocar **"Compartir por WhatsApp"**:
 
@@ -26,9 +27,11 @@ Al tocar **"Compartir por WhatsApp"**:
 
 WhatsApp no permite adjuntar archivos por link (`wa.me`), por eso el fallback descarga el documento.
 
-## Offline
+## Offline y auto-actualización
 
 Es una PWA instalable: en la primera visita (con internet) el service worker pre-cachea todos los assets y desde ahí la app arranca y funciona sin conexión. El borrador del pedido en curso se guarda automáticamente en el dispositivo (localStorage), así que un reinicio del navegador no lo pierde. No hay historial ni datos en la nube: todo queda en el celular del vendedor.
+
+Al ingresar (cada vez que la app abre con internet, y cada 10 minutos mientras esté en uso) chequea si hay una versión nueva publicada. Si existe, el service worker la descarga y activa, y la app se recarga sola mostrando la versión nueva — no hace falta borrar datos del navegador ni reenviar el link. Sin internet sigue funcionando con la última versión que tenga cacheada.
 
 ## Cómo correrla en desarrollo
 
