@@ -1,5 +1,23 @@
 import { useEffect, useState } from 'react'
 import { jsPDF } from 'jspdf'
+import logoUrl from './assets/DimacoLogo.png'
+
+const VERSION = 'v0.78'
+
+let logoCache = null
+
+const getLogoDataUrl = async () => {
+  if (logoCache) return logoCache
+  const res = await fetch(logoUrl)
+  const blob = await res.blob()
+  logoCache = await new Promise((resolve, reject) => {
+    const fr = new FileReader()
+    fr.onload = () => resolve(fr.result)
+    fr.onerror = reject
+    fr.readAsDataURL(blob)
+  })
+  return logoCache
+}
 
 const num = (v) => {
   const n = parseFloat(String(v).replace(',', '.'))
@@ -28,13 +46,15 @@ const archivoPDF = (cliente) => {
   return `pedido-${slug || 'cliente'}.pdf`
 }
 
-const VERSION = 'v0.75'
-
 function crearPDF(data) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const W = doc.internal.pageSize.getWidth()
   const M = 16
   const Wt = W - 2 * M
+
+  if (data.logo) {
+    doc.addImage(data.logo, 'PNG', M, 8, 12, 12)
+  }
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(16)
@@ -136,7 +156,7 @@ function crearPDF(data) {
   doc.setFontSize(8)
   doc.setTextColor(120)
   const H = doc.internal.pageSize.getHeight()
-  doc.text('Documento generado con DIMACO - Vendedores', W / 2, H - 12, { align: 'center' })
+  doc.text('Documento generado con Vendedores', W / 2, H - 12, { align: 'center' })
 
   return doc
 }
@@ -184,6 +204,7 @@ export default function App() {
     setAviso('')
     setBusy(true)
     try {
+      const logo = await getLogoDataUrl()
       const data = {
         cliente,
         condicion,
@@ -193,6 +214,7 @@ export default function App() {
         transporte,
         chofer,
         observaciones,
+        logo,
       }
       const doc = crearPDF(data)
       const nombre = archivoPDF(cliente)
@@ -229,7 +251,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="topbar">
-        <h1>DIMACO - Vendedores</h1>
+        <h1>Vendedores</h1>
         <button type="button" className="btn-ghost" onClick={limpiar}>
           Limpiar
         </button>

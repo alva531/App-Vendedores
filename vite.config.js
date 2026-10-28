@@ -8,11 +8,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'DIMACO - Vendedores',
-        short_name: 'DIMACO',
+        name: 'Vendedores',
+        short_name: 'Vendedores',
         description: 'Pedidos para compartir por WhatsApp',
         lang: 'es',
-        theme_color: '#227ea8',
+        theme_color: '#f8fafc',
         background_color: '#f8fafc',
         display: 'standalone',
         orientation: 'portrait',

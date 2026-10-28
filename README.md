@@ -1,4 +1,4 @@
-# DIMACO - Vendedores
+# Vendedores (DIMACO)
 
 PWA (Progressive Web App) para que los vendedores de DIMACO armen pedidos desde el celular y los compartan como PDF por WhatsApp. Funciona en Android e iOS, sinstores ni Mac: se abre un link y queda instalada.
 
@@ -60,7 +60,7 @@ El hosting debe servir con **HTTPS** (Netlify y cia lo hacen por defecto), es re
 
 1. Abrir el link publicado en Chrome (Android) o Safari (iPhone)
 2. Menú del navegador → **"Agregar a pantalla de inicio"**
-3. Queda instalada como app "DIMACO" con su ícono y arranca a pantalla completa, sin barra del navegador
+3. Queda instalada como app "Vendedores" con el logo de DIMACO y arranca a pantalla completa, sin barra del navegador
 
 ## Stack
 

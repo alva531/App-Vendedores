@@ -33,7 +33,8 @@ input {
 .app {
   max-width: 560px;
   margin: 0 auto;
-  padding: 12px 14px calc(28px + env(safe-area-inset-bottom));
+  padding: calc(12px + env(safe-area-inset-top)) 14px
+    calc(28px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 12px;
