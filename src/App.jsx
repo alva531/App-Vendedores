@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { jsPDF } from 'jspdf'
 import logoUrl from './assets/DimacoLogo.png'
 
-const VERSION = 'v0.80'
+const VERSION = 'v0.81'
 
 let logoCache = null
 
@@ -99,7 +99,7 @@ function crearPDF(data) {
   let y = yInfo + 6
   const rowBase = 6.8
 
-  doc.setFillColor(34, 126, 168)
+  doc.setFillColor(0, 38, 95)
   doc.rect(M, y - 5.6, Wt, rowBase, 'F')
   doc.setTextColor(255)
   doc.setFontSize(9)
