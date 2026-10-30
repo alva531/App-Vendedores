@@ -1,6 +1,10 @@
 # Vendedores (DIMACO)
 
-PWA (Progressive Web App) para que los vendedores de DIMACO armen pedidos desde el celular y los compartan como PDF por WhatsApp. Funciona en Android e iOS, sinstores ni Mac: se abre un link y queda instalada.
+PWA (Progressive Web App) para que los vendedores de DIMACO armen pedidos desde el celular y los compartan como PDF por WhatsApp. Funciona en Android e iOS, sin app stores ni Mac: se abre un link y queda instalada.
+
+> **Aviso:** esta app está principalmente hecha con IA.
+
+**Por qué existe:** fue pensada para unificar el formato de los pedidos que reciben los vendedores de la empresa. Al tener todos los pedidos la misma estructura (mismo formulario, mismo PDF), se evita que se pierdan datos cuando la información viaja entre áreas.
 
 ## Qué hace la app
 
@@ -8,15 +12,14 @@ Formulario en pantalla táctil con:
 
 - **Cliente** (texto libre)
 - **Condición**: selector A / M
-- **Entrega**: Despacho (con modalidad Retira Cliente o Con Envío) o Logística (con el checkbox "Incluye transporte" y datos del chofer)
+- **Entrega**: Despacho (con modalidad Retira Cliente o Con Envío) o Logística (con el checkbox "Incluye transporte" y datos del chofer opcional)
 - **Productos dinámicos**: nombre + cantidad por fila, con botones para agregar/quitar
-- **Checkbox "Incluye transporte"**: al marcarlo pide datos del chofer (nombre y apellido), DNI y patentes
 - **Descuento 1 y Descuento 2** (porcentajes, opcionales)
 - **Observaciones** (textarea, opcional; se imprime al final del PDF)
 
 Al tocar **"Compartir por WhatsApp"**:
 
-1. Genera un PDF (`pedido-<cliente>.pdf`) con encabezado PEDIDO/DIMACO, datos del cliente, tabla de producto/cantidad, descuentos cargados y fecha
+1. Genera un PDF (`pedido_<cliente>_DESPACHO.pdf` o `pedido_<cliente>_LOGISTICA.pdf` según el tipo de entrega) con encabezado PEDIDO/DIMACO, datos del cliente, tabla de producto/cantidad, descuentos cargados y fecha
 2. Abre la hoja de compartir del sistema con el PDF adjunto para elegir WhatsApp
 
 ## Comportamiento por navegador
@@ -53,7 +56,7 @@ npm run build        # genera la carpeta dist/
 
 ## Cómo desplegar
 
-La forma más rápida: arrastrar la carpeta `dist/` a [Netlify Drop](https://app.netlify.com/drop) — da un link https al toque. Alternativas: Vercel, Cloudflare Pages, o deploy automatic desde este repo conectando Netlify/Vercel al branch main.
+La forma más rápida: arrastrar la carpeta `dist/` a [Netlify Drop](https://app.netlify.com/drop) — da un link https al toque. Alternativas: Vercel, Cloudflare Pages, GitHub Pages (subiendo el contenido de `dist/` a la branch publicada — el build usa rutas relativas, así que funciona igual en la raíz que en subcarpetas tipo `usuario.github.io/repo/`), o deploy automático conectando este repo a Netlify/Vercel.
 
 El hosting debe servir con **HTTPS** (Netlify y cia lo hacen por defecto), es requisito para que la PWA se instale y se comparta archivos.
 

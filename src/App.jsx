@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { jsPDF } from 'jspdf'
 import logoUrl from './assets/DimacoLogo.png'
 
-const VERSION = 'v0.85'
+const VERSION = 'v0.86'
 
 let logoCache = null
 
