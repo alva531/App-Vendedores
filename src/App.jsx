@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { jsPDF } from 'jspdf'
 import logoUrl from './assets/DimacoLogo.png'
 
-const VERSION = 'v0.81'
+const VERSION = 'v0.84'
 
 let logoCache = null
 
@@ -37,13 +37,14 @@ const loadDraft = () => {
   }
 }
 
-const archivoPDF = (cliente) => {
+const archivoPDF = (cliente, entrega) => {
   const slug = (cliente || 'cliente')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-  return `pedido-${slug || 'cliente'}.pdf`
+  const tipo = entrega === 'despacho' ? 'DESPACHO' : 'LOGISTICA'
+  return `pedido_${slug || 'cliente'}_${tipo}.pdf`
 }
 
 function crearPDF(data) {
@@ -74,11 +75,11 @@ function crearPDF(data) {
     ['Cliente:', data.cliente || '-'],
     ['Condición:', data.condicion],
   ]
-  if (data.transporte) {
-    filas.push(['Transporte:', 'Incluye transporte'])
-    if (data.chofer) filas.push(['Chofer:', data.chofer])
+  if (data.entrega === 'despacho') {
+    filas.push(['Despacho:', data.modalidad === 'envio' ? 'Con Envío' : 'Retira Cliente'])
   } else {
-    filas.push(['Transporte:', 'No incluye transporte'])
+    filas.push(['Logística:', data.transporte ? 'Incluye transporte' : 'No incluye transporte'])
+    if (data.transporte && data.chofer) filas.push(['Chofer:', data.chofer])
   }
   const xVal = M + 26
   let yInfo = 40
@@ -165,6 +166,8 @@ export default function App() {
   const d = loadDraft()
   const [cliente, setCliente] = useState(d?.cliente ?? '')
   const [condicion, setCondicion] = useState(d?.condicion ?? 'A')
+  const [entrega, setEntrega] = useState(d?.entrega ?? 'logistica')
+  const [modalidad, setModalidad] = useState(d?.modalidad ?? 'retira')
   const [desc1, setDesc1] = useState(d?.desc1 ?? '')
   const [desc2, setDesc2] = useState(d?.desc2 ?? '')
   const [transporte, setTransporte] = useState(d?.transporte ?? false)
@@ -179,9 +182,9 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(
       'pedido',
-      JSON.stringify({ cliente, condicion, desc1, desc2, transporte, chofer, productos, observaciones }),
+      JSON.stringify({ cliente, condicion, entrega, modalidad, desc1, desc2, transporte, chofer, productos, observaciones }),
     )
-  }, [cliente, condicion, desc1, desc2, transporte, chofer, productos, observaciones])
+  }, [cliente, condicion, entrega, modalidad, desc1, desc2, transporte, chofer, productos, observaciones])
 
   const porc1 = num(desc1)
   const porc2 = num(desc2)
@@ -208,6 +211,8 @@ export default function App() {
       const data = {
         cliente,
         condicion,
+        entrega,
+        modalidad,
         productos: validos,
         porc1,
         porc2,
@@ -217,7 +222,7 @@ export default function App() {
         logo,
       }
       const doc = crearPDF(data)
-      const nombre = archivoPDF(cliente)
+      const nombre = archivoPDF(cliente, entrega)
       const blob = doc.output('blob')
       const archivo = new File([blob], nombre, { type: 'application/pdf' })
       const texto = `Pedido para ${cliente} - Condición: ${condicion}`
@@ -238,6 +243,8 @@ export default function App() {
   const limpiar = () => {
     setCliente('')
     setCondicion('A')
+    setEntrega('logistica')
+    setModalidad('retira')
     setDesc1('')
     setDesc2('')
     setTransporte(false)
@@ -284,27 +291,71 @@ export default function App() {
           </div>
         </div>
 
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={transporte}
-            onChange={(e) => setTransporte(e.target.checked)}
-          />
-          <span>Incluye transporte</span>
-        </label>
-
-        {transporte && (
-          <div className="transporte">
-            <label>
-              <span>Chofer (opcional)</span>
-              <input
-                value={chofer}
-                onChange={(e) => setChofer(e.target.value)}
-                placeholder="Nombre y apellido"
-                autoComplete="off"
-              />
-            </label>
+        <div className="field">
+          <span>Entrega</span>
+          <div className="segmented">
+            {[
+              ['despacho', 'Despacho'],
+              ['logistica', 'Logística'],
+            ].map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                className={entrega === v ? 'seg active' : 'seg'}
+                onClick={() => setEntrega(v)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
+        </div>
+
+        {entrega === 'despacho' && (
+          <div className="field">
+            <span>Modalidad</span>
+            <div className="segmented">
+              {[
+                ['retira', 'Retira Cliente'],
+                ['envio', 'Con Envío'],
+              ].map(([v, label]) => (
+                <button
+                  key={v}
+                  type="button"
+                  className={modalidad === v ? 'seg active' : 'seg'}
+                  onClick={() => setModalidad(v)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {entrega === 'logistica' && (
+          <>
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={transporte}
+                onChange={(e) => setTransporte(e.target.checked)}
+              />
+              <span>Incluye transporte</span>
+            </label>
+
+            {transporte && (
+              <div className="transporte">
+                <label>
+                  <span>Chofer (opcional)</span>
+                  <input
+                    value={chofer}
+                    onChange={(e) => setChofer(e.target.value)}
+                    placeholder="Nombre y apellido"
+                    autoComplete="off"
+                  />
+                </label>
+              </div>
+            )}
+          </>
         )}
 
         <ul className="productos">

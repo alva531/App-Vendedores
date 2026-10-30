@@ -8,6 +8,7 @@ Formulario en pantalla táctil con:
 
 - **Cliente** (texto libre)
 - **Condición**: selector A / M
+- **Entrega**: Despacho (con modalidad Retira Cliente o Con Envío) o Logística (con el checkbox "Incluye transporte" y datos del chofer)
 - **Productos dinámicos**: nombre + cantidad por fila, con botones para agregar/quitar
 - **Checkbox "Incluye transporte"**: al marcarlo pide datos del chofer (nombre y apellido), DNI y patentes
 - **Descuento 1 y Descuento 2** (porcentajes, opcionales)
